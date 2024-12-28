@@ -1,0 +1,32 @@
+version: '3'
+services:
+  project_odoo18:
+    container_name: ${WEB_HOST}
+    image: ${WEB_IMAGE_NAME}:${WEB_IMAGE_TAG}
+    depends_on:
+      - project_odoo_db
+    ports:
+      - "${WEB_PORT}:8069"
+    restart: always
+    volumes:
+      - project_odoo-webv:/var/lib/odoo
+      - /config:/etc/odoo
+      - /addons:/mnt/extra-addons
+      - /log:/var/log/odoo
+    entrypoint: "/usr/bin/odoo -c /etc/odoo/odoo.conf"
+
+  project_odoo_db:
+    container_name: ${DB_HOST}
+    image: ${DB_IMAGE}:${DB_TAG}
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PASSWORD=${DB_PASSWD}
+      - POSTGRES_USER=${DB_USER}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - project_odoo-dbv:/var/lib/postgresql/data/pgdata
+volumes:
+  project_odoo-dbv:
+  project_odoo-webv:
