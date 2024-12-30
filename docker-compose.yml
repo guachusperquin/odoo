@@ -3,7 +3,7 @@ services:
   odoo-web:
     image: odoo:17.0
     depends_on:
-      - oddo-db
+      - odoo-db
     ports:
       - "${PORT}:8069"
     environment:
