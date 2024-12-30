@@ -1,32 +1,28 @@
-version: '3'
+version: '3.1'
 services:
-  project_odoo18:
-    container_name: ${WEB_HOST}
-    image: ${WEB_IMAGE_NAME}:${WEB_IMAGE_TAG}
+  odoo-web:
+    image: odoo:17.0
     depends_on:
-      - project_odoo_db
+      - oddo-db
     ports:
-      - "${WEB_PORT}:8069"
-    restart: always
-    volumes:
-      - project_odoo-webv:/var/lib/odoo
-      - /config:/etc/odoo
-      - /addons:/mnt/extra-addons
-      - /log:/var/log/odoo
-    entrypoint: "/usr/bin/odoo -c /etc/odoo/odoo.conf"
-
-  project_odoo_db:
-    container_name: ${DB_HOST}
-    image: ${DB_IMAGE}:${DB_TAG}
+      - "${PORT}:8069"
     environment:
-      - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_PASSWORD=${DB_PASSWD}
-      - POSTGRES_USER=${DB_USER}
-      - PGDATA=/var/lib/postgresql/data/pgdata
-    ports:
-      - "${DB_PORT}:5432"
+    - HOST=odoo-db
+    - USER=${WEBUSER}
+    - PASSWORD=${WEBPASSWORD}
     volumes:
-      - project_odoo-dbv:/var/lib/postgresql/data/pgdata
+    - odoo-web-data:/var/lib/odoo
+    - ./config:/etc/odoo
+    - ./addons:/mnt/extra-addons
+
+  odoo-db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=${DBNAME}
+      - POSTGRES_PASSWORD=${DBPASSWORD}
+      - POSTGRES_USER=${DBUSER}
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data/pgdata
 volumes:
-  project_odoo-dbv:
-  project_odoo-webv:
+  odoo-web-data:
+  odoo-db-data:
